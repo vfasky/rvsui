@@ -355,6 +355,8 @@ define('rvsui/route', [], function() {
  */
 
 define('rvsui/select', ['jquery', 'rvsui/widgetBase'], function($, Widget){
+    "use strict";
+    
     var $win = $(window);
 
     Widget.reg('select', Widget.subclass({
@@ -438,7 +440,6 @@ define('rvsui/select', ['jquery', 'rvsui/widgetBase'], function($, Widget){
             }).on('click', '.item', function(){
                 var $el = $(this);
                 var value = $el.attr('data-value');
-                self.update(value);
                 self.sync(value);
                 self.hideList();
                 
@@ -644,6 +645,8 @@ define('rvsui/view', ['jquery', 'stapes', 'rivets', 'rvsui/rivetsExt'], function
  */
 
 define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, rivets){
+    "use strict";
+
     var id = 0; 
     
     var WidgetBase = stapes.subclass({
@@ -698,9 +701,6 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
          * @return {Void}
          */
         sync: function(value){
-            if(false === $.isPlainObject(this.view.model)){
-                return;
-            }
             if(this.view.keypath.indexOf(':') !== -1){
                 var temp = this.view.keypath.split(':');
                 var root = temp[0];
@@ -708,14 +708,7 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
                 var key = keypath.split('.').pop();
                 var self = this.view.observer.obj[root];
                 if(self){
-                    this.view.model[key] = value;
-                    self.emit('change:' + keypath, value); 
-                    //通知上层
-                    if(keypath.indexOf('.') !== -1){
-                        var paths = keypath.split('.');
-                        var parent = paths[paths.length - 2];
-                        self.emit('change:' + parent, this.view.model);
-                    }
+                    this.view.model.set(key, value);
                 }
             }
         }

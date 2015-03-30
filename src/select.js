@@ -5,6 +5,8 @@
  */
 
 define('rvsui/select', ['jquery', 'rvsui/widgetBase'], function($, Widget){
+    "use strict";
+    
     var $win = $(window);
 
     Widget.reg('select', Widget.subclass({
@@ -88,7 +90,6 @@ define('rvsui/select', ['jquery', 'rvsui/widgetBase'], function($, Widget){
             }).on('click', '.item', function(){
                 var $el = $(this);
                 var value = $el.attr('data-value');
-                self.update(value);
                 self.sync(value);
                 self.hideList();
                 
