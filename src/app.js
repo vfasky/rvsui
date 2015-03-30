@@ -45,7 +45,7 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
             var self = this;
             if(this._view){
                 if(this._view.name === viewName){
-                    this._view.instantiate.run.apply(null, args);
+                    this._view.instantiate.run.apply(this._view.instantiate, args);
                     return;
                 }
                 else{
@@ -59,8 +59,8 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
                     name: viewName,
                     instantiate: new View($el, self)
                 };
-                self.view = view;
-                view.instantiate.run.apply(null, args);
+                self._view = view;
+                view.instantiate.run.apply(view.instantiate, args);
                 view.instantiate.$el.appendTo(self.$el);
             });
 

@@ -45,7 +45,7 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
             var self = this;
             if(this._view){
                 if(this._view.name === viewName){
-                    this._view.instantiate.run.apply(null, args);
+                    this._view.instantiate.run.apply(this._view.instantiate, args);
                     return;
                 }
                 else{
@@ -59,8 +59,8 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
                     name: viewName,
                     instantiate: new View($el, self)
                 };
-                self.view = view;
-                view.instantiate.run.apply(null, args);
+                self._view = view;
+                view.instantiate.run.apply(view.instantiate, args);
                 view.instantiate.$el.appendTo(self.$el);
             });
 
@@ -368,7 +368,6 @@ define('rvsui/view', ['jquery', 'stapes', 'rivets', 'rvsui/rivetsExt'], function
         constructor: function($el, app) {
             this.$el = $el;
             this.app = app;
-            this._initTplUri = null;
             this.init();
         },
         /**
@@ -421,25 +420,34 @@ define('rvsui/view', ['jquery', 'stapes', 'rivets', 'rvsui/rivetsExt'], function
             this.$el.remove();
         },
         /**
-         * 渲染模板
+         * 渲染html
+         * 注：一个view, 只对应一个html模板
          *
-         * @param {String} uri - 模板路径
+         * @param {String} html - 模板
          * @param {Object} data - {key: promise}, key 将传递到模板中
          * @return {promise}
          */
-        render: function(uri, data) {
-            if (!data) {
-                return this.initTpl(uri);
-            }
-            var self = this;
+        renderString: function(html, data){
             var dtd = $.Deferred();
+            var self = this;
+            data = data || {};
 
-            this.initTpl(uri).done(function() {
-                var keys = Object.keys(data);
+            if (!this.view) {
+                this.$el.html(html);
+                this.bind();
+                this.watch();
+            }
+
+            var keys = Object.keys(data);
+            if(keys.length === 0){
+                dtd.resolve();
+            }
+            else{
                 var promises = [];
                 keys.forEach(function(key) {
                     promises.push(data[key]);
                 });
+
                 self.when.apply(self, promises).done(function() {
                     var args = Array.prototype.slice.call(arguments);
 
@@ -454,37 +462,30 @@ define('rvsui/view', ['jquery', 'stapes', 'rivets', 'rvsui/rivetsExt'], function
                 }).fail(function() {
                     dtd.reject();
                 });
-            }).fail(function() {
-                dtd.reject();
-            });
+            }
 
             return dtd.promise();
         },
         /**
-         * 将模板加入this.el, 并绑定
-         * 注：同一uri,只会执行一次
+         * 加载html,并渲染模板
+         * 注：一个view, 只对应一个html模板
          *
-         * @param uri
+         * @param {String} uri - 模板路径
+         * @param {Object} data - {key: promise}, key 将传递到模板中
          * @return {promise}
          */
-        initTpl: function(uri) {
-            var dtd = $.Deferred();
+        render: function(uri, data) {
             var self = this;
 
-            if (this._initTplUri === uri) {
-                dtd.resolve(this.view);
-            } else {
-                if (null !== this._initTplUri) {
-                    this.unbind();
-                }
-                this.loadTpl(uri).done(function(html) {
-                    self.$el.html(html);
-                    dtd.resolve(self.bind());
-                    self.watch();
-                }).fail(function() {
-                    dtd.reject();
-                });
-            }
+            var dtd = $.Deferred();
+            this.loadTpl(uri).done(function(html) {
+                self.renderString(html, data)
+                    .done(function(){
+                        dtd.resolve();
+                    }).fail(function() {
+                        dtd.reject();
+                    });
+            });
             return dtd.promise();
         },
         /**

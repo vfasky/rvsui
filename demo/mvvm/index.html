@@ -3,37 +3,62 @@
 <head>
     <title></title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="http://dn-cdnjscn.qbox.me/ajax/libs/semantic-ui/1.9.3/semantic.min.css">
+    <link rel="stylesheet" href="http://dn-cdnjscn.qbox.me/ajax/libs/mocha/2.2.1/mocha.min.css">
 </head>
 <body>
-    <a href="#/test/vfasky">test</a>
     <div id="demo"></div>
 
-    <script src="http://dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.9/require.min.js"></script>
+    <div id="mocha"></div>
 
+    <script src="http://dn-cdnjscn.qbox.me/ajax/libs/mocha/2.2.1/mocha.min.js"></script>
+    <script src="http://dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.9/require.min.js"></script>
     <script src="../../config.js"></script>
 
     <script>
+        mocha.setup('bdd');
+
         require.config({
             baseUrl: '../../'
         });
+        
+        describe('mvvm test', function() {
+            it('render', function(done) {
+                define('demo/mvvm', ['rvsui'], function(rvsui){
+                    return rvsui.View.subclass({
+                        constructor : rvsui.View.prototype.constructor,
+                        run: function(name){
+                            var self = this;
+                            self.renderString(
+                                '<input rv-value="self:test">' +
+                                '<h3 rv-text="self:test"></h3>'
+                            ,{
+                                test: name
+                            }).done(function(){
+                                if(self.$el.html().indexOf('<input') === 0){
+                                    done();
+                                }
+                                else{
+                                    done('render error');
+                                }
+                            })
+                        }
+                    });
+                });
 
-        define('demo/mvvm', ['rvsui'], function(rvsui){
-            return rvsui.View.subclass({
-                constructor : rvsui.View.prototype.constructor,
-                run: function(name){
-                    console.log('test', name)
-                }
+                require(['rvsui', 'jquery'], function(rvsui, $){
+                    var app = new rvsui.App($('#demo')); 
+
+                    app.route('test/:name', 'demo/mvvm')
+                       .run();
+
+                    window.location.hash = 'test/hello';
+                });
+
             });
+
         });
 
-        require(['rvsui', 'jquery'], function(rvsui, $){
-            var app = new rvsui.App($('#demo')); 
-
-            app.route('/test/:name', 'demo/mvvm')
-               .route('', 'demo/mvvm')
-               .run()
-        });
+        mocha.run();
     </script>
 </body>
 </html>
