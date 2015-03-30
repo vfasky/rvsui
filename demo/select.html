@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>semantic ui to rivetsjs</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="http://dn-cdnjscn.qbox.me/ajax/libs/semantic-ui/1.9.3/semantic.min.css">
+</head>
+<body>
+    <div id="test">
+        <select placeholder="请选择" data-static rv-select="self:value" name="some_name">
+            <option value="option1">option1</option>
+            <option value="option2">option2</option>
+        </select>
+
+        <select placeholder="请选择" rv-select="" name="some_name">
+            <option value="option1">option1</option>
+            <option value="option2">option2</option>
+        </select>
+
+    </div>
+
+    <script src="http://dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.9/require.min.js"></script>
+    <script src="http://dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.9/require.min.js"></script>
+    <script src="../config.js"></script>
+    
+    <script>
+        require.config({
+            baseUrl: '../'
+        });
+        
+        require(['rvsui'], function(rvsui){
+            var view = new rvsui.View($('#test'));
+            view.set('value', 'option2');
+            view.bind();
+        });
+    </script>
+</body>
+</html>
