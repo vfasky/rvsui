@@ -786,14 +786,12 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
          *     <input type="text" name="reNumber" validator="equals [name=number] 两次输入的值不相等" />
          * </form>
          *
-         * @return {undefined}
+         * @return {Void}
          */
         Widget.reg('validator', Widget.subclass({
             constructor: Widget.prototype.constructor,
             init: function() {
-                var $el = this.$soure;
                 var self = this;
-                this.$validators = $el.find('[validator]');
 
                 this.initRules();
 
@@ -806,6 +804,7 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
             initRules: function(){
                 var self = this;
                 this.rules = [];
+                this.$validators = this.$soure.find('[validator]');
                 this.$validators.each(function() {
                     self.parseValidator($(this));
                 });
