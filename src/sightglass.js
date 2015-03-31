@@ -203,10 +203,11 @@
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = sightglass
   } else if (typeof define === 'function' && define.amd) {
-    define([], function() {
+    define('sightglass', [], function() {
       return this.sightglass = sightglass
     })
   } else {
     this.sightglass = sightglass
   }
 }).call(this);
+
