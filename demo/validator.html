@@ -10,11 +10,11 @@
 <body>
     <div id="test">
         <form rv-validator rv-on-submit="self.save">
+            <input rv-checkbox="self:select" title="test" type="checkbox" name="select" validator="required" />
             <input type="text" name="email" validator="required 不能为空 | isEmail 邮箱格式不正确 | minlength  6   不能小于6个字符  | maxlength 10 最多只能输10个字符"/>
             <input type="text" name="number" validator="required | min 6 | max 10 最大值为10"/>
-            <input type="text" name="reNumber" validator="equals [name=number] 两次输入的值不相等" />
+            <input type="text" name="reNumber" validator="equals [name=number] 两次输入的值不相等 " />
 
-            <input type="checkbox" name="select" validator="required" />
 
             <button type="submit">save</button>
          </form>
@@ -33,8 +33,11 @@
                 constructor: rvsui.View.prototype.constructor,
                 save: function(el){
                     var $el = $(el);
-                    var check = $el.data('check');
-                    check();
+                    var data = $el.data('check')();
+                    
+                    if(data){
+                        console.log(data);
+                    }
                     
                     return false;
                 }

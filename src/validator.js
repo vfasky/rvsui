@@ -34,7 +34,7 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
          */
         addRule('required', function($el, msg) {
             msg = msg || '不能为空';
-            if ($el.is('checkbox, radio')) {
+            if (['checkbox', 'radio'].indexOf($el.attr('type')) !== -1) {
                 return {
                     status: $el.prop('checked'),
                     msg: msg
@@ -256,15 +256,40 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
                 var $el = this.$soure;
                 var self = this;
                 this.$validators = $el.find('[validator]');
-                this.rules = [];
 
-                this.$validators.each(function() {
-                    self.parseValidator($(this));
-                });
+                this.initRules();
 
                 this.$soure.data('check', function(){
                     return self.check();
+                }).data('initRules', function(){
+                    return self.initRules();
                 });
+            },
+            initRules: function(){
+                var self = this;
+                this.rules = [];
+                this.$validators.each(function() {
+                    self.parseValidator($(this));
+                });
+            },
+            watch: function(){
+                var self = this;
+                this.$soure.on('focus change', '[validator]', function(){
+                    var $el = $(this);
+                    self.hideError($el);
+                }).on('click', '.popup', function(){
+                    var $el = $(this);
+                    $el.removeClass('visible').addClass('hidden');
+                    $el.data('soure').focus();
+                    return false;
+                });
+            },
+            getData: function(){
+                var data = {};
+                this.$soure.serializeArray().forEach(function(v){
+                    data[v.name] = v.value;
+                });
+                return data;
             },
             check: function(){
                 var isPass = true;
@@ -277,10 +302,35 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
                         return false;
                     }
                 });
-                return false;
+                return isPass ? this.getData() : false;
             },
             showError: function($el, msg){
-                console.log($el, msg);
+                var $tip = this.getErrorTip($el);
+                $tip.html(msg);
+            },
+            hideError: function($el){
+                var $tip = $el.data('tip');
+                if($tip){
+                    $tip.removeClass('visible').addClass('hidden');
+                }
+            },
+            getErrorTip: function($el){
+                var $tip = $el.data('tip');
+                if(!$tip){
+                    $tip = $('<div class="ui red label popup transition bottom left visible" />');
+
+                    $tip.appendTo(this.$soure);
+                    $tip.data('soure', $el);
+                    $el.data('tip', $tip);
+                }
+                else{
+                    $tip.addClass('visible').removeClass('hidden');
+                }
+                var $target = $el.data('proxyEl') || $el;
+                var offset = $target.offset();
+                offset.top += ($el.height() || 20) + 3;
+                $tip.css(offset);
+                return $tip;
             },
             parseValidator: function($el) {
                 var self = this;
@@ -290,10 +340,11 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
                         return $.trim(v).length > 0;
                     });
                     var rule = _checkRule[args[0]];
-
-                    if (args[0] === 'equals') {
+                    var ruleName = args[0];
+                    if (ruleName === 'equals') {
                         args[1] = self.$soure.find(args[1]);
                     }
+            
                     args[0] = $el;
 
                     if (rule) {
@@ -301,6 +352,9 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
                             rule: rule,
                             args: args
                         });
+                    }
+                    else{
+                        console.log('validator rule: ' +  ruleName + ' undefined !');
                     }
                 });
             }
