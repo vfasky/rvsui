@@ -71,6 +71,26 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
 
 ;
 /**
+ *
+ * @date 2015-03-31 13:28:21
+ * @author vfasky <vfasky@gmail.com>
+ */
+
+define('rvsui/checkbox', ['jquery', 'rvsui/widgetBase', 'rvsui/toggle'],
+    function($, Widget) {
+        var Toggle = Widget.get('toggle');
+
+        Widget.reg('checkbox', Toggle.subclass({
+            constructor: Toggle.prototype.constructor,
+            getClassName: function(){
+                return 'ui checkbox';
+            }
+        }));
+    }
+);
+
+;
+/**
  * rivets 配置及扩展
  * @date 2015-03-29 21:58:45
  * @author vfasky <vfasky@gmail.com>
@@ -442,6 +462,7 @@ define('rvsui/select', ['jquery', 'rvsui/widgetBase'], function($, Widget){
                 var value = $el.attr('data-value');
                 self.sync(value);
                 self.hideList();
+                self.$soure.trigger('change');
                 
                 return false;
             });
@@ -455,6 +476,60 @@ define('rvsui/select', ['jquery', 'rvsui/widgetBase'], function($, Widget){
             $win.off('click.rvsuiSelect' + this.id);
         }
     }));
+});
+
+;
+/**
+ * toggle 开关 
+ * @date 2015-03-31 12:43:47
+ * @author vfasky <vfasky@gmail.com>
+ */
+
+define('rvsui/toggle', ['jquery', 'rvsui/widgetBase'], function($, Widget){
+    
+    /**
+     * @example
+     * <input type="radio" rv-toggle="self:value" value="1" title="test"/> 
+     *
+     * @return {Void}
+     */
+    Widget.reg('toggle', Widget.subclass({
+        constructor: Widget.prototype.constructor,
+        getClassName: function(){
+            return 'ui toggle checkbox';
+        },
+        init: function(){
+            this.$soure.wrap('<div class="' + this.getClassName() + '"/>');
+            this.$el = this.$soure.parent();
+            this.$label = $('<label />');
+
+            this.$label.text(this.$soure.attr('title') || '');
+            this.$label.appendTo(this.$el);
+        },
+        update: function(value){
+            if(String(value) === String(this.$soure.val())){
+                this.$soure.prop('checked', true);
+                this.$el.attr('class', this.getClassName() + ' checked');
+            }
+            else{
+                this.$soure.prop('checked', false);
+                this.$el.attr('class', this.getClassName());
+            }
+        },
+        watch: function(){
+            var self = this;
+            this.$el.on('click', function(){
+                if(self.$soure.prop('checked')){
+                    self.sync('');
+                }
+                else{
+                    self.sync(self.$soure.val());
+                }
+                self.$soure.trigger('change');
+                return false;
+            });
+        }
+    })); 
 });
 
 ;
@@ -648,6 +723,8 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
     "use strict";
 
     var id = 0; 
+
+    var map = {};
     
     var WidgetBase = stapes.subclass({
         constructor: function(el, view){
@@ -693,6 +770,9 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
          */
         destroy: function(){
             this.$soure.remove();
+            if(this.$el){
+                this.$el.remove();
+            }
         },
         /**
          * 同步数据到view
@@ -722,6 +802,7 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
      * @return {Void}
      */
     WidgetBase.reg = function(tag, Widget){
+        map[tag] = Widget;
         rivets.binders[tag] = {
             bind: function(el){
                 this.widget = new Widget(el, this);    
@@ -735,6 +816,16 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
         };
     };
 
+    /**
+     * 从注册的标签中，取对象
+     *
+     * @param {String} tag
+     * @return {WidgetBase}
+     */
+    WidgetBase.get = function(tag){
+        return map[tag];
+    };
+
     return WidgetBase;
 });
 
@@ -745,7 +836,9 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
  * @author vfasky <vfasky@gmail.com>
  */
 
-define('rvsui', ['rvsui/app', 'rvsui/view', 'rvsui/select'],
+define('rvsui', 
+    ['rvsui/app', 'rvsui/view', 'rvsui/select', 'rvsui/toggle',
+     'rvsui/checkbox'],
     function(App, View) {
         "use strict";
 

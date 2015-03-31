@@ -8,6 +8,8 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
     "use strict";
 
     var id = 0; 
+
+    var map = {};
     
     var WidgetBase = stapes.subclass({
         constructor: function(el, view){
@@ -53,6 +55,9 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
          */
         destroy: function(){
             this.$soure.remove();
+            if(this.$el){
+                this.$el.remove();
+            }
         },
         /**
          * 同步数据到view
@@ -82,6 +87,7 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
      * @return {Void}
      */
     WidgetBase.reg = function(tag, Widget){
+        map[tag] = Widget;
         rivets.binders[tag] = {
             bind: function(el){
                 this.widget = new Widget(el, this);    
@@ -93,6 +99,16 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
                 this.widget.update(value || '', el);
             }
         };
+    };
+
+    /**
+     * 从注册的标签中，取对象
+     *
+     * @param {String} tag
+     * @return {WidgetBase}
+     */
+    WidgetBase.get = function(tag){
+        return map[tag];
     };
 
     return WidgetBase;

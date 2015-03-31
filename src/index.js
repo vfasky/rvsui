@@ -4,7 +4,9 @@
  * @author vfasky <vfasky@gmail.com>
  */
 
-define('rvsui', ['rvsui/app', 'rvsui/view', 'rvsui/select'],
+define('rvsui', 
+    ['rvsui/app', 'rvsui/view', 'rvsui/select', 'rvsui/toggle',
+     'rvsui/checkbox'],
     function(App, View) {
         "use strict";
 

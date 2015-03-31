@@ -92,6 +92,7 @@ define('rvsui/select', ['jquery', 'rvsui/widgetBase'], function($, Widget){
                 var value = $el.attr('data-value');
                 self.sync(value);
                 self.hideList();
+                self.$soure.trigger('change');
                 
                 return false;
             });
