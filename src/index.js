@@ -6,7 +6,7 @@
 
 define('rvsui', 
     ['rvsui/app', 'rvsui/view', 'rvsui/select', 'rvsui/toggle',
-     'rvsui/checkbox'],
+     'rvsui/checkbox', 'rvsui/validator'],
     function(App, View) {
         "use strict";
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>semantic ui to rivetsjs</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="http://dn-cdnjscn.qbox.me/ajax/libs/semantic-ui/1.9.3/semantic.min.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+</head>
+<body>
+    <div id="test">
+        <form rv-validator rv-on-submit="self.save">
+            <input type="text" name="email" validator="required 不能为空 | isEmail 邮箱格式不正确 | minlength  6   不能小于6个字符  | maxlength 10 最多只能输10个字符"/>
+            <input type="text" name="number" validator="required | min 6 | max 10 最大值为10"/>
+            <input type="text" name="reNumber" validator="equals [name=number] 两次输入的值不相等" />
+
+            <input type="checkbox" name="select" validator="required" />
+
+            <button type="submit">save</button>
+         </form>
+    </div>
+
+    <script src="http://dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.9/require.min.js"></script>
+    <script src="../config.js"></script>
+    
+    <script>
+        require.config({
+            baseUrl: '../'
+        });
+        
+        require(['rvsui'], function(rvsui){
+            var View = rvsui.View.subclass({
+                constructor: rvsui.View.prototype.constructor,
+                save: function(el){
+                    var $el = $(el);
+                    var check = $el.data('check');
+                    check();
+                    
+                    return false;
+                }
+            });
+            var view = new View($('#test'));
+            view.bind();
+        });
+    </script>
+</body>
+</html>

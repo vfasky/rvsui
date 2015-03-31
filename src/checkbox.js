@@ -6,6 +6,8 @@
 
 define('rvsui/checkbox', ['jquery', 'rvsui/widgetBase', 'rvsui/toggle'],
     function($, Widget) {
+        "use strict";
+        
         var Toggle = Widget.get('toggle');
 
         Widget.reg('checkbox', Toggle.subclass({

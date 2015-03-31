@@ -5,6 +5,7 @@
  */
 
 define('rvsui/toggle', ['jquery', 'rvsui/widgetBase'], function($, Widget){
+    "use strict";
     
     /**
      * @example
