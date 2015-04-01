@@ -1539,7 +1539,8 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
         constructor: function(options, $root){
             this.options = $.extend({
                 title: '',
-                content: ''
+                content: '',
+                yes: '确认'
             }, options);
 
             this.id = id++;
@@ -1643,14 +1644,23 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
         },
         initActions: function(){
             this.$actions.html(
-                '<div role="yes" class="ui green button">确认</div>'
+                '<div role="yes" class="ui green button">' + this.options.yes + '</div>'
             );
         }
     });
 
+    /**
+     * alert 弹框
+     *
+     * @param {String} content
+     * @param {Function} callback
+     * @param {String} title
+     * @return {Window}
+     */
     Window.alert = function(content, callback, title){
         title = title || '提示信息';
         callback = callback || function(){};
+        var isCall = false;
 
         if(!Window._alert){
             Window._alert = new Window({
@@ -1660,22 +1670,101 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
         }
         else{
             Window._alert.off('hide');
-            Window._alert.off('ok');
+            Window._alert.off('yes');
             Window._alert.setTitle(title);
             Window._alert.setContent(content);
         }
 
         Window._alert.on('hide', function(){
-            callback(false);
+            if(isCall === false){
+                callback(false);
+            }
         });
 
-        Window._alert.on('ok', function(){
+        Window._alert.on('yes', function(){
+            isCall = true;
             callback(true);
         });
 
         Window._alert.show();
 
         return Window._alert;
+    };
+
+    /**
+     * 确认弹窗 
+     *
+     * @return {Window}
+     */
+    Window.Confirm = Window.subclass({
+        constructor: Window.prototype.constructor,
+        watch: function(){
+            Window.Confirm.parent.watch.call(this);
+
+            var self = this;
+            this.$el.on('click', '[role=no]', function(){
+                self.emit('no');
+                self.hide();
+                return false;
+            });
+        },
+        initActions: function(){
+            var yes = this.options.yes || '是';
+            var no = this.options.no || '否';
+
+            this.$actions.html(
+                '<div role="no" class="ui negative button">'+ no +'</div>' + 
+                '<div role="yes" class="ui positive right labeled icon button">' +
+                    yes + ' <i class="checkmark icon"></i>'+
+                '</div>'
+            );
+        }
+    });
+
+    /**
+     * 单实例的确认弹窗
+     *
+     * @param content
+     * @param callback
+     * @param title
+     * @return {Window}
+     */
+    Window.confirm = function(content, callback, title){
+        callback = callback || function(){};
+        title = title || '请确认';
+        var isCall = false;
+
+        if(!Window._confirm){
+            Window._confirm = new Window.Confirm({
+                title: title,
+                content: content
+            });
+        }
+        else{
+            Window._confirm.off('hide');
+            Window._confirm.off('yes');
+            Window._confirm.off('no');
+            Window._confirm.setTitle(title);
+            Window._confirm.setContent(content);
+        }
+
+        Window._confirm.on('hide', function(){
+            if(false === isCall){
+                callback(false);
+            }
+        });
+
+        Window._confirm.on('yes', function(){
+            isCall = true;
+            callback(true);
+        });
+
+        Window._confirm.on('no', function(){
+            isCall = true;
+            callback(false);
+        });
+
+        Window._confirm.show();
     };
 
 

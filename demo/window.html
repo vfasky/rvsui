@@ -21,13 +21,25 @@
         require(['rvsui'], function(rvsui){
             var win = new rvsui.Window({
                 title: 'test',
-                content: 'hello ?'
+                content: 'hello ?',
+                yes: 'ok'
             });
 
             win.show();
 
             win.on('hide', function(){
-                rvsui.Window.alert('ok?');
+                rvsui.Window.alert('ok?', function(ret){
+                    var msg = ret ? '你点了是' : '你直接关了';
+
+                    rvsui.Window.confirm(msg, function(ret){
+                        if(ret){
+                            rvsui.Window.alert('是');
+                        }
+                        else{
+                            rvsui.Window.alert('否');
+                        }
+                    });
+                });
                 win.destroy();
             });
                 
