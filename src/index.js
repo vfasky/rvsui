@@ -5,15 +5,17 @@
  */
 
 define('rvsui', 
-    ['rvsui/app', 'rvsui/view', 'rvsui/select', 'rvsui/toggle',
+    ['rvsui/app', 'rvsui/view', 'rvsui/window',
+     'rvsui/select', 'rvsui/toggle',
      'rvsui/checkbox', 'rvsui/validator', 'rvsui/loading',
      'rvsui/progress'
     ],
-    function(App, View) {
+    function(App, View, Window) {
         "use strict";
 
         return {
             App: App,
-            View: View
+            View: View,
+            Window: Window
         };
     });
