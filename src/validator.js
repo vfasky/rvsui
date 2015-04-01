@@ -254,14 +254,35 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
             constructor: Widget.prototype.constructor,
             init: function() {
                 var self = this;
+                this.$soure.addClass('ui');
 
+                this.initLoading();
+                
                 this.initRules();
 
                 this.$soure.data('check', function(){
                     return self.check();
                 }).data('initRules', function(){
                     return self.initRules();
-                });
+                }).data('loading', self.loading);
+            },
+            initLoading: function(){
+                var self = this;
+                this.$load = $('<div class="ui active inverted dimmer">'+
+                                  '<div class="ui active loader" />' +
+                               '</div>').hide();
+                this.$load.appendTo(this.$soure);
+
+                this.loading = {
+                    show: function(){
+                        self.$load.show();
+                        self.$soure.addClass('segment');
+                    },
+                    hide: function(){
+                        self.$load.hide();
+                        self.$soure.removeClass('segment');
+                    }
+                };
             },
             initRules: function(){
                 var self = this;
@@ -293,11 +314,13 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
             check: function(){
                 var isPass = true;
                 var self = this;
+                this.loading.show();
                 $.each(this.rules, function(k, v){
                     var res = v.rule.apply(null, v.args);
                     if(res.status !== true){
                         isPass = false;
                         self.showError(v.args[0], res.msg);
+                        self.loading.hide();
                         return false;
                     }
                 });

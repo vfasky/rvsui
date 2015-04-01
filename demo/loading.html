@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>semantic ui to rivetsjs</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="http://dn-cdnjscn.qbox.me/ajax/libs/semantic-ui/1.9.3/semantic.min.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+</head>
+<body>
+    <div id="test" >
+        <div rv-loading="self:isLoad" class="ui segment">
+            <div class="ui success message">
+                <div class="header">
+                    Your user registration was successful.
+                </div>
+                <p>You may now log-in with the username you have chosen</p>
+            </div>
+        </div>
+
+        <button rv-on-click="self.toggle" rv-text="self:title"></button>
+    </div>
+
+    <script src="http://dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.9/require.min.js"></script>
+    <script src="../config.js"></script>
+    
+    <script>
+        require.config({
+            baseUrl: '../'
+        });
+        
+        require(['rvsui'], function(rvsui){
+            var view = new rvsui.View($('#test'));
+            view.set('isLoad', true);
+            view.set('title', 'hide')
+            view.toggle = function(){
+                if(view.get('isLoad')){
+                    view.set('isLoad', false);
+                    view.set('title', 'show');
+                }
+                else{
+                    view.set('isLoad', true);
+                    view.set('title', 'hide');
+                }
+                return false;
+            };
+            view.bind();
+        });
+    </script>
+</body>
+</html>

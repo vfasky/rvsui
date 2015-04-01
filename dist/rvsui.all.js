@@ -93,6 +93,90 @@ define('rvsui/checkbox', ['jquery', 'rvsui/widgetBase', 'rvsui/toggle'],
 
 ;
 /**
+ * loading 
+ * @date 2015-04-01 08:16:38
+ * @author vfasky <vfasky@gmail.com>
+ */
+
+define('rvsui/loading', ['jquery', 'rvsui/widgetBase'], function($, Widget){
+    "use strict";
+    
+    Widget.reg('loading', Widget.subclass({
+        constructor: Widget.prototype.constructor,
+        init: function(){
+            this.$soure.addClass('ui');
+
+            this.$load = $('<div class="ui active inverted dimmer">'+
+                              '<div class="ui active loader" />' +
+                           '</div>').hide();
+
+            this.notClass = this.$soure.is('.segment') === false;
+
+            this.$load.appendTo(this.$soure);
+        },
+        update: function(value){
+            if(value){
+                this.show();
+            }
+            else{
+                this.hide();
+            }
+        },
+        show: function(){
+            this.$load.show();
+            if(this.notClass){
+                this.$soure.addClass('segment');
+            }
+        },
+        hide: function(){
+            this.$load.hide();
+            if(this.notClass){
+                this.$soure.removeClass('segment');
+            }
+        }
+    })); 
+});
+
+;
+/**
+ * 进度条 
+ * @date 2015-04-01 08:35:49
+ * @author vfasky <vfasky@gmail.com>
+ */
+
+define('rvsui/progress', ['jquery', 'rvsui/widgetBase'], function($, Widget){
+    "use strict";
+    
+    Widget.reg('progress', Widget.subclass({
+        constructor: Widget.prototype.constructor,
+        init: function(){
+            this.$soure.addClass('ui indicating progress');
+            this.$val = $('<div class="bar"><div class="progress" /></div>');
+            this.$val.appendTo(this.$soure);
+
+            this.$label = $('<div class="label" />').appendTo(this.$soure);
+        },
+        update: function(value){
+            value = parseInt(value || '0');
+
+            if(value > 100){
+                value = 100;
+            }
+
+            value = String(value);
+
+            this.$label.html(this.$soure.attr('title') || '');
+            
+            this.$val.css({
+                width: value + '%'
+            }).find('.progress').text(value + '%');
+        }
+    }));
+    
+});
+
+;
+/**
  * rivets 配置及扩展
  * @date 2015-03-29 21:58:45
  * @author vfasky <vfasky@gmail.com>
@@ -1007,14 +1091,35 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
             constructor: Widget.prototype.constructor,
             init: function() {
                 var self = this;
+                this.$soure.addClass('ui');
 
+                this.initLoading();
+                
                 this.initRules();
 
                 this.$soure.data('check', function(){
                     return self.check();
                 }).data('initRules', function(){
                     return self.initRules();
-                });
+                }).data('loading', self.loading);
+            },
+            initLoading: function(){
+                var self = this;
+                this.$load = $('<div class="ui active inverted dimmer">'+
+                                  '<div class="ui active loader" />' +
+                               '</div>').hide();
+                this.$load.appendTo(this.$soure);
+
+                this.loading = {
+                    show: function(){
+                        self.$load.show();
+                        self.$soure.addClass('segment');
+                    },
+                    hide: function(){
+                        self.$load.hide();
+                        self.$soure.removeClass('segment');
+                    }
+                };
             },
             initRules: function(){
                 var self = this;
@@ -1046,11 +1151,13 @@ define('rvsui/validator', ['jquery', 'rvsui/widgetBase'],
             check: function(){
                 var isPass = true;
                 var self = this;
+                this.loading.show();
                 $.each(this.rules, function(k, v){
                     var res = v.rule.apply(null, v.args);
                     if(res.status !== true){
                         isPass = false;
                         self.showError(v.args[0], res.msg);
+                        self.loading.hide();
                         return false;
                     }
                 });
@@ -1424,7 +1531,9 @@ define('rvsui/widgetBase', ['jquery', 'stapes', 'rivets'], function($, stapes, r
 
 define('rvsui', 
     ['rvsui/app', 'rvsui/view', 'rvsui/select', 'rvsui/toggle',
-     'rvsui/checkbox', 'rvsui/validator'],
+     'rvsui/checkbox', 'rvsui/validator', 'rvsui/loading',
+     'rvsui/progress'
+    ],
     function(App, View) {
         "use strict";
 

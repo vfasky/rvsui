@@ -36,6 +36,7 @@
                     var data = $el.data('check')();
                     
                     if(data){
+                        $el.data('loading').hide();
                         console.log(data);
                     }
                     
