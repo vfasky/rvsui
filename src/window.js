@@ -199,9 +199,9 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
     /**
      * 单实例的确认弹窗
      *
-     * @param content
-     * @param callback
-     * @param title
+     * @param {String} content
+     * @param {Function} callback
+     * @param {String} title
      * @return {Window}
      */
     Window.confirm = function(content, callback, title){
@@ -240,6 +240,8 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
         });
 
         Window._confirm.show();
+
+        return Window._confirm;
     };
 
 

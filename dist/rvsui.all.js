@@ -4,16 +4,16 @@
  * @author vfasky <vfasky@gmail.com>
  */
 
-define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, route){
+define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, route) {
     "use strict";
-    
+
     return stapes.subclass({
-        constructor: function($el, options){
+        constructor: function($el, options) {
             this.$el = $el;
             this.options = $.extend({
                 viewClass: 'rvsui-view'
             }, options);
-            
+
             this._view = null;
             this._onLoad = {};
         },
@@ -24,14 +24,14 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
          * @param {String} viewName - view的名称
          * @return {rvsui.App}
          */
-        route: function(path, viewName){
+        route: function(path, viewName) {
             var self = this;
-            route(path, function(){
+            route(path, function() {
                 self.runView(viewName, arguments);
             });
             return this;
         },
-        run: function(){
+        run: function() {
             route.reload();
         },
         /**
@@ -41,20 +41,19 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
          * @param {Array} args - 参数名
          * @return {Void}
          */
-        runView: function(viewName, args){
+        runView: function(viewName, args) {
             var self = this;
-            if(this._view){
-                if(this._view.name === viewName){
+            if (this._view) {
+                if (this._view.name === viewName) {
                     this._view.instantiate.run.apply(this._view.instantiate, args);
                     return;
-                }
-                else{
+                } else {
                     this._view.instantiate.destroy();
                 }
             }
 
-            require([viewName], function(View){
-                var $el = $('<div class="'+ self.options.viewClass +'"></div>');
+            require([viewName], function(View) {
+                var $el = $('<div class="' + self.options.viewClass + '"></div>');
                 var view = {
                     name: viewName,
                     instantiate: new View($el, self)
@@ -66,7 +65,7 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
 
         }
     });
-    
+
 });
 
 ;
@@ -1724,9 +1723,9 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
     /**
      * 单实例的确认弹窗
      *
-     * @param content
-     * @param callback
-     * @param title
+     * @param {String} content
+     * @param {Function} callback
+     * @param {String} title
      * @return {Window}
      */
     Window.confirm = function(content, callback, title){
@@ -1765,6 +1764,8 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
         });
 
         Window._confirm.show();
+
+        return Window._confirm;
     };
 
 
