@@ -1776,7 +1776,7 @@ define('rvsui/window', ['jquery', 'stapes'], function($, stapes){
 /**
  * rvsui pack
  * @date 2015-03-29 22:12:53
- * @author vfasky <vfasky@gmail.com> 
+ * @author vfasky <vfasky@gmail.com>
  */
 
 define('rvsui',
