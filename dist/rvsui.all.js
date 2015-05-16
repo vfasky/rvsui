@@ -42,6 +42,7 @@ define('rvsui/app', ['jquery', 'stapes', 'rvsui/route'], function($, stapes, rou
          * @return {Void}
          */
         runView: function(viewName, args) {
+            
             var self = this;
             if (this._view) {
                 if (this._view.name === viewName) {
